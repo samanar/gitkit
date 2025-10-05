@@ -3,10 +3,11 @@ package git
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 )
 
-func RunGitCommand(args ...string) (string, error) {
+func Run(args ...string) (string, error) {
 	cmd := exec.Command("git", args...)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
@@ -19,4 +20,25 @@ func RunGitCommand(args ...string) (string, error) {
 	}
 
 	return out.String(), nil
+}
+
+func RunMust(args ...string) string {
+	output, err := Run(args...)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "❌ git %v failed:\n%s\n", args, output)
+		os.Exit(1)
+	}
+	return output
+}
+
+func Push() {
+	RunMust("push")
+}
+
+func Pull() {
+	RunMust("pull", "--rebase")
+}
+
+func Fetch() {
+	RunMust("fetch")
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"gitkit/git"
 
 	"github.com/spf13/cobra"
 )
@@ -12,7 +13,8 @@ var featureStartCmd = &cobra.Command{
 	Short: "Start a new feature",
 	Long:  `Start a new feature branch or process in gitkit.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Feature started!")
+		branchName := git.CurrentBranch()
+		fmt.Println("Feature started!", branchName)
 	},
 }
 
