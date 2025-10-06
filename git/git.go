@@ -3,6 +3,7 @@ package git
 import (
 	"bytes"
 	"fmt"
+	"gitkit/config"
 	"os"
 	"os/exec"
 	"strings"
@@ -78,4 +79,38 @@ func CommitAll(message string) {
 func Tag(tag string) {
 	RunMust("tag", tag)
 	RunMust("push", "origin", tag)
+}
+
+func RootDir() (string, error) {
+	out, err := Run("rev-parse", "--show-toplevel")
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(out), nil
+}
+
+func SyncRemoteBranch(branch string) {
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "❌ Could not load .gitkit.yml: %v\n", err)
+		os.Exit(1)
+	}
+	if _, err := Run("pull", "--rebase", cfg.Remote, branch); err != nil {
+		fmt.Fprintf(os.Stderr, "❌ Failed to pull latest '%s': %v\n", branch, err)
+		os.Exit(1)
+	}
+}
+
+// CreatePrefixedBranch creates a new branch from baseBranch with prefix and branchName.
+func CreatePrefixedBranch(baseBranch, prefix, branchName string) error {
+	// Checkout base branch
+	if _, err := Run("checkout", baseBranch); err != nil {
+		return fmt.Errorf("failed to checkout '%s': %w", baseBranch, err)
+	}
+	// Create new branch from base
+	newBranch := prefix + branchName
+	if _, err := Run("checkout", "-b", newBranch, baseBranch); err != nil {
+		return fmt.Errorf("failed to create branch '%s': %w", newBranch, err)
+	}
+	return nil
 }
