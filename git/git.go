@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func Run(args ...string) (string, error) {
@@ -41,4 +42,40 @@ func Pull() {
 
 func Fetch() {
 	RunMust("fetch")
+}
+
+func IsClean() bool {
+	output := RunMust("status", "--porcelain")
+	return strings.TrimSpace(output) == ""
+}
+
+func CreateBranch(branch string) {
+	RunMust("checkout", "-b", branch)
+}
+
+func CreateAndPushBranch(branch string) {
+	CreateBranch(branch)
+	PushWithSetUpstream(branch)
+}
+
+func PushWithSetUpstream(branch string) {
+	RunMust("push", "--set-upstream", "origin", branch)
+}
+
+func Merge(branch string) {
+	RunMust("merge", "--no-ff", branch)
+}
+
+func MergeSquash(branch string) {
+	RunMust("merge", "--squash", branch)
+}
+
+func CommitAll(message string) {
+	RunMust("add", "-A")
+	RunMust("commit", "-m", message)
+}
+
+func Tag(tag string) {
+	RunMust("tag", tag)
+	RunMust("push", "origin", tag)
 }
