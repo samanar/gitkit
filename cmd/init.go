@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"gitkit/config"
 	"gitkit/git"
 	"os"
 	"path/filepath"
@@ -27,23 +26,24 @@ var initCmd = &cobra.Command{
 		if _, err := os.Stat(cfgPath); err == nil {
 			fmt.Printf("⚠️  Config file already exists at %s\n", cfgPath)
 			fmt.Print("Do you want to overwrite it? (y/N): ")
-			confirm := strings.ToLower(strings.TrimSpace(config.ReadLine()))
+			confirm := strings.ToLower(strings.TrimSpace(git.ReadLine()))
 			if confirm != "y" && confirm != "yes" {
 				fmt.Println("Aborted.")
 				return nil
 			}
 		}
 
-		cfg := config.GitKitConfig{}
+		cfg := git.GitKitConfig{}
 
 		// Ask user inputs with defaults
 		fmt.Println("Let's set up your gitkit configuration:")
-		cfg.Branches.Main = config.Ask("Main branch name", "main")
-		cfg.Branches.Develop = config.Ask("Develop branch name", "develop")
-		cfg.Prefixes.Feature = config.Ask("Feature prefix", "feature/")
-		cfg.Prefixes.Hotfix = config.Ask("Hotfix prefix", "hotfix/")
-		cfg.Prefixes.Release = config.Ask("Release prefix", "release/")
-		cfg.Remote = config.Ask("Remote name", "origin")
+		cfg.Branches.Main = git.Ask("Main branch name", "main")
+		cfg.Branches.Develop = git.Ask("Develop branch name", "develop")
+		cfg.Prefixes.Feature = git.Ask("Feature prefix", "feature/")
+		cfg.Prefixes.Feature = git.Ask("Bugfix prefix", "bugfix/")
+		cfg.Prefixes.Hotfix = git.Ask("Hotfix prefix", "hotfix/")
+		cfg.Prefixes.Release = git.Ask("Release prefix", "release/")
+		cfg.Remote = git.Ask("Remote name", "origin")
 
 		// Save YAML file
 		data, err := yaml.Marshal(&cfg)

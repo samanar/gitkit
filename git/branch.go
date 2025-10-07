@@ -49,3 +49,20 @@ func Checkout(branch string) {
 	RunMust("checkout", branch)
 	Pull()
 }
+
+func RemovePrefix(branch, prefix string) string {
+	if strings.HasPrefix(branch, prefix) {
+		return branch[len(prefix):]
+	}
+	return branch
+}
+
+func BranchExists(branch string) bool {
+	branches := Branches()
+	for _, b := range branches {
+		if b == branch {
+			return true
+		}
+	}
+	return false
+}

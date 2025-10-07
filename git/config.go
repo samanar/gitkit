@@ -1,9 +1,8 @@
-package config
+package git
 
 import (
 	"bufio"
 	"fmt"
-	"gitkit/git"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,6 +17,7 @@ type GitKitConfig struct {
 	} `yaml:"branches"`
 	Prefixes struct {
 		Feature string `yaml:"feature"`
+		BugFix  string `yaml:"bugfix"`
 		Hotfix  string `yaml:"hotfix"`
 		Release string `yaml:"release"`
 	} `yaml:"prefixes"`
@@ -26,7 +26,7 @@ type GitKitConfig struct {
 }
 
 func LoadConfig() (*GitKitConfig, error) {
-	root, err := git.RootDir()
+	root, err := RootDir()
 	if err != nil {
 		return nil, err
 	}

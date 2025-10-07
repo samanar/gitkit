@@ -8,16 +8,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var featureCmd = &cobra.Command{
-	Use:   "feature",
-	Short: "Feature related commands",
-	Long:  `Commands to manage features in gitkit.`,
+var bugFixCmd = &cobra.Command{
+	Use:   "bugfix",
+	Short: "Bugfix related commands",
 }
 
-// featureStartCmd represents the 'feature start' command
-var featureStartCmd = &cobra.Command{
+var bugFixStartCmd = &cobra.Command{
 	Use:   "start",
-	Short: "Start a new feature",
+	Short: "Start a new bugFix",
 	Long:  `Start a new feature branch or process in gitkit.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg, err := git.LoadConfig()
@@ -26,24 +24,24 @@ var featureStartCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		featurePrefix := cfg.Prefixes.Feature
+		bugFixPrefix := cfg.Prefixes.BugFix
 		developBranch := cfg.Branches.Develop
-		featureName := args[0]
+		bugFixName := args[0]
+		bugFixName = git.RemovePrefix(bugFixName, bugFixPrefix)
 
 		git.SyncRemoteBranch(developBranch)
 
 		// Use reusable method to create the branch
-		if err := git.CreatePrefixedBranch(developBranch, featurePrefix, featureName); err != nil {
+		if err := git.CreatePrefixedBranch(developBranch, bugFixPrefix, bugFixName); err != nil {
 			fmt.Fprintf(os.Stderr, "❌ %v\n", err)
 			os.Exit(1)
 		}
 
-		fmt.Printf("✅ Feature branch '%s%s' started from '%s'.\n", featurePrefix, featureName, developBranch)
+		fmt.Printf("✅ Feature branch '%s%s' started from '%s'.\n", bugFixPrefix, bugFixName, developBranch)
 	},
 }
 
-// featureEndCmd represents the 'feature end' command
-var featureEndCmd = &cobra.Command{
+var bugFixFinishCmd = &cobra.Command{
 	Use:   "finish",
 	Short: "Finish the current feature",
 	Args:  cobra.MaximumNArgs(1),
@@ -53,7 +51,7 @@ var featureEndCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "❌ Could not load .gitkit.yml: %v\n", err)
 			os.Exit(1)
 		}
-		featurePrefix := cfg.Prefixes.Feature
+		bugFixPrefix := cfg.Prefixes.BugFix
 		developBranch := cfg.Branches.Develop
 		var branch string
 		if len(args) == 1 {
@@ -61,16 +59,16 @@ var featureEndCmd = &cobra.Command{
 		} else {
 			branch = git.CurrentBranch()
 		}
-		branch = git.RemovePrefix(branch, featurePrefix)
-		branch = featurePrefix + branch
+		branch = git.RemovePrefix(branch, bugFixPrefix)
+		branch = bugFixPrefix + branch
 		git.MergeBranchToBase(developBranch, branch)
 
-		fmt.Printf("✅ Feature branch '%s' finished and merged into '%s'.\n", branch, developBranch)
+		fmt.Printf("✅ BugFix branch '%s' finished and merged into '%s'.\n", branch, developBranch)
 	},
 }
 
 func init() {
-	featureCmd.AddCommand(featureStartCmd)
-	featureCmd.AddCommand(featureEndCmd)
-	rootCmd.AddCommand(featureCmd)
+	bugFixCmd.AddCommand(bugFixStartCmd)
+	bugFixCmd.AddCommand(bugFixFinishCmd)
+	rootCmd.AddCommand(bugFixCmd)
 }

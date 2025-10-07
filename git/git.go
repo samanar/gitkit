@@ -3,7 +3,6 @@ package git
 import (
 	"bytes"
 	"fmt"
-	"gitkit/config"
 	"os"
 	"os/exec"
 	"strings"
@@ -90,7 +89,7 @@ func RootDir() (string, error) {
 }
 
 func SyncRemoteBranch(branch string) {
-	cfg, err := config.LoadConfig()
+	cfg, err := LoadConfig()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Could not load .gitkit.yml: %v\n", err)
 		os.Exit(1)
@@ -113,4 +112,16 @@ func CreatePrefixedBranch(baseBranch, prefix, branchName string) error {
 		return fmt.Errorf("failed to create branch '%s': %w", newBranch, err)
 	}
 	return nil
+}
+
+func MergeBranchToBase(baseBranch, branch string) {
+	if !BranchExists(branch) {
+		fmt.Fprintf(os.Stderr, "❌ branch '%s' does not exist.\n", branch)
+		os.Exit(1)
+	}
+	Checkout(baseBranch)
+	Pull()
+	Merge(branch)
+	DeleteBranchSafe(branch)
+	Push()
 }
