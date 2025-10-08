@@ -39,10 +39,38 @@ var initCmd = &cobra.Command{
 		fmt.Println("Let's set up your gitkit configuration:")
 		cfg.Branches.Main = git.Ask("Main branch name", "main")
 		cfg.Branches.Develop = git.Ask("Develop branch name", "develop")
-		cfg.Prefixes.Feature = git.Ask("Feature prefix", "feature/")
-		cfg.Prefixes.Feature = git.Ask("Bugfix prefix", "bugfix/")
-		cfg.Prefixes.Hotfix = git.Ask("Hotfix prefix", "hotfix/")
-		cfg.Prefixes.Release = git.Ask("Release prefix", "release/")
+		cfg.Prefixes = make(map[string]struct {
+			Name string `yaml:"name"`
+			Base string `yaml:"base"`
+		})
+		cfg.Prefixes["feature"] = struct {
+			Name string `yaml:"name"`
+			Base string `yaml:"base"`
+		}{
+			Name: git.Ask("Feature prefix", "feature/"),
+			Base: cfg.Branches.Develop,
+		}
+		cfg.Prefixes["bugFix"] = struct {
+			Name string `yaml:"name"`
+			Base string `yaml:"base"`
+		}{
+			Name: git.Ask("Bugfix prefix", "bugfix/"),
+			Base: cfg.Branches.Develop,
+		}
+		cfg.Prefixes["hotFix"] = struct {
+			Name string `yaml:"name"`
+			Base string `yaml:"base"`
+		}{
+			Name: git.Ask("Hotfix prefix", "hotfix/"),
+			Base: cfg.Branches.Main,
+		}
+		cfg.Prefixes["release"] = struct {
+			Name string `yaml:"name"`
+			Base string `yaml:"base"`
+		}{
+			Name: git.Ask("Release prefix", "release/"),
+			Base: cfg.Branches.Develop,
+		}
 		cfg.Remote = git.Ask("Remote name", "origin")
 
 		// Save YAML file

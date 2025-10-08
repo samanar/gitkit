@@ -1,71 +1,43 @@
 package cmd
 
 import (
-	"fmt"
 	"gitkit/git"
-	"os"
 
 	"github.com/spf13/cobra"
 )
 
 var featureCmd = &cobra.Command{
-	Use:   "feature",
-	Short: "Feature related commands",
-	Long:  `Commands to manage features in gitkit.`,
+	Use:     "feature",
+	Aliases: []string{"f", "feat"},
+	Short:   "Feature related commands",
+	Long:    `Commands to manage features in gitkit.`,
 }
 
 // featureStartCmd represents the 'feature start' command
 var featureStartCmd = &cobra.Command{
-	Use:   "start",
-	Short: "Start a new feature",
-	Long:  `Start a new feature branch or process in gitkit.`,
+	Use:     "start",
+	Short:   "Start a new feature",
+	Aliases: []string{"s", "new", "begin"},
+	Long:    `Start a new feature branch or process in gitkit.`,
+	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg, err := git.LoadConfig()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "❌ Could not load .gitkit.yml: %v\n", err)
-			os.Exit(1)
-		}
-
-		featurePrefix := cfg.Prefixes.Feature
-		developBranch := cfg.Branches.Develop
-		featureName := args[0]
-
-		git.SyncRemoteBranch(developBranch)
-
-		// Use reusable method to create the branch
-		if err := git.CreatePrefixedBranch(developBranch, featurePrefix, featureName); err != nil {
-			fmt.Fprintf(os.Stderr, "❌ %v\n", err)
-			os.Exit(1)
-		}
-
-		fmt.Printf("✅ Feature branch '%s%s' started from '%s'.\n", featurePrefix, featureName, developBranch)
+		branchName := args[0]
+		git.StartBranch("feature", branchName)
 	},
 }
 
 // featureEndCmd represents the 'feature end' command
 var featureEndCmd = &cobra.Command{
-	Use:   "finish",
-	Short: "Finish the current feature",
-	Args:  cobra.MaximumNArgs(1),
+	Use:     "finish",
+	Short:   "Finish the current feature",
+	Aliases: []string{"f", "end", "complete"},
+	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg, err := git.LoadConfig()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "❌ Could not load .gitkit.yml: %v\n", err)
-			os.Exit(1)
-		}
-		featurePrefix := cfg.Prefixes.Feature
-		developBranch := cfg.Branches.Develop
-		var branch string
+		var branchName string = ""
 		if len(args) == 1 {
-			branch = args[0]
-		} else {
-			branch = git.CurrentBranch()
+			branchName = args[0]
 		}
-		branch = git.RemovePrefix(branch, featurePrefix)
-		branch = featurePrefix + branch
-		git.MergeBranchToBase(developBranch, branch)
-
-		fmt.Printf("✅ Feature branch '%s' finished and merged into '%s'.\n", branch, developBranch)
+		git.FinishBranch("feature", branchName)
 	},
 }
 

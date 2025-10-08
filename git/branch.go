@@ -1,6 +1,10 @@
 package git
 
-import "strings"
+import (
+	"fmt"
+	"os"
+	"strings"
+)
 
 func CurrentBranch() string {
 	output := RunMust("branch", "--show-current")
@@ -65,4 +69,58 @@ func BranchExists(branch string) bool {
 		}
 	}
 	return false
+}
+
+func StartBranch(branchType, branchName string) {
+	cfg, err := LoadConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "❌ Could not load .gitkit.yml: %v\n", err)
+		os.Exit(1)
+	}
+	prefixCfg, ok := cfg.Prefixes[branchType]
+	if !ok {
+		fmt.Printf("❌ Unknown type: %s\n", branchType)
+		return
+	}
+	branchName = RemovePrefix(branchName, prefixCfg.Name)
+
+	SyncRemoteBranch(prefixCfg.Base)
+
+	// // Use reusable method to create the branch
+	if err := CreatePrefixedBranch(prefixCfg.Base, prefixCfg.Name, branchName); err != nil {
+		fmt.Fprintf(os.Stderr, "❌ %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("✅ Feature branch '%s%s' started from '%s'.\n", prefixCfg.Name, branchName, prefixCfg.Base)
+}
+
+func FinishBranch(branchType, branchName string) {
+	cfg, err := LoadConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "❌ Could not load .gitkit.yml: %v\n", err)
+		os.Exit(1)
+	}
+	prefixCfg, ok := cfg.Prefixes[branchType]
+	if !ok {
+		fmt.Printf("❌ Unknown type: %s\n", branchType)
+		return
+	}
+	prefix := prefixCfg.Name
+	base := prefixCfg.Base
+	var branch string
+	if branchName == "" {
+		branch = branchName
+	} else {
+		branch = CurrentBranch()
+	}
+	branch = RemovePrefix(branch, prefix)
+	branch = prefix + branch
+	if !BranchExists(branch) {
+		fmt.Fprintf(os.Stderr, "❌ branch '%s' does not exist.\n", branch)
+		os.Exit(1)
+	}
+	MergeBranchToBase(base, branch)
+
+	fmt.Printf("✅ Feature branch '%s' finished and merged into '%s'.\n", branch, base)
 }

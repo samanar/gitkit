@@ -1,69 +1,39 @@
 package cmd
 
 import (
-	"fmt"
 	"gitkit/git"
-	"os"
 
 	"github.com/spf13/cobra"
 )
 
 var bugFixCmd = &cobra.Command{
-	Use:   "bugfix",
-	Short: "Bugfix related commands",
+	Use:     "bugfix",
+	Aliases: []string{"fix", "bug"},
+	Short:   "Bugfix related commands",
 }
 
 var bugFixStartCmd = &cobra.Command{
-	Use:   "start",
-	Short: "Start a new bugFix",
-	Long:  `Start a new feature branch or process in gitkit.`,
+	Use:     "start",
+	Short:   "Start a new bugFix",
+	Aliases: []string{"s", "new", "begin"},
+	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg, err := git.LoadConfig()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "❌ Could not load .gitkit.yml: %v\n", err)
-			os.Exit(1)
-		}
-
-		bugFixPrefix := cfg.Prefixes.BugFix
-		developBranch := cfg.Branches.Develop
-		bugFixName := args[0]
-		bugFixName = git.RemovePrefix(bugFixName, bugFixPrefix)
-
-		git.SyncRemoteBranch(developBranch)
-
-		// Use reusable method to create the branch
-		if err := git.CreatePrefixedBranch(developBranch, bugFixPrefix, bugFixName); err != nil {
-			fmt.Fprintf(os.Stderr, "❌ %v\n", err)
-			os.Exit(1)
-		}
-
-		fmt.Printf("✅ Feature branch '%s%s' started from '%s'.\n", bugFixPrefix, bugFixName, developBranch)
+		branchName := args[0]
+		git.StartBranch("bugFix", branchName)
 	},
 }
 
 var bugFixFinishCmd = &cobra.Command{
-	Use:   "finish",
-	Short: "Finish the current feature",
-	Args:  cobra.MaximumNArgs(1),
+	Use:     "finish",
+	Aliases: []string{"f", "end", "complete"},
+	Short:   "Finish the current Bugfix",
+	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg, err := git.LoadConfig()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "❌ Could not load .gitkit.yml: %v\n", err)
-			os.Exit(1)
-		}
-		bugFixPrefix := cfg.Prefixes.BugFix
-		developBranch := cfg.Branches.Develop
-		var branch string
+		var branchName string = ""
 		if len(args) == 1 {
-			branch = args[0]
-		} else {
-			branch = git.CurrentBranch()
+			branchName = args[0]
 		}
-		branch = git.RemovePrefix(branch, bugFixPrefix)
-		branch = bugFixPrefix + branch
-		git.MergeBranchToBase(developBranch, branch)
-
-		fmt.Printf("✅ BugFix branch '%s' finished and merged into '%s'.\n", branch, developBranch)
+		git.FinishBranch("bugFix", branchName)
 	},
 }
 

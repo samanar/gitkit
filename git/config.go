@@ -15,11 +15,9 @@ type GitKitConfig struct {
 		Main    string `yaml:"main"`
 		Develop string `yaml:"develop"`
 	} `yaml:"branches"`
-	Prefixes struct {
-		Feature string `yaml:"feature"`
-		BugFix  string `yaml:"bugfix"`
-		Hotfix  string `yaml:"hotfix"`
-		Release string `yaml:"release"`
+	Prefixes map[string]struct {
+		Name string `yaml:"name"`
+		Base string `yaml:"base"`
 	} `yaml:"prefixes"`
 	Remote string `yaml:"remote"`
 	// AutoSync bool   `yaml:"autoSync"`
@@ -31,7 +29,7 @@ func LoadConfig() (*GitKitConfig, error) {
 		return nil, err
 	}
 
-	path := filepath.Join(root, ".gitflow.yml")
+	path := filepath.Join(root, ".gitkit.yml")
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
