@@ -66,6 +66,10 @@ func Merge(branch string) {
 	RunMust("merge", "--no-ff", branch)
 }
 
+func MergeWithCommitMessage(branch, commit string) {
+	RunMust("merge", "--no-ff", branch, "-m", commit)
+}
+
 func MergeSquash(branch string) {
 	RunMust("merge", "--squash", branch)
 }
@@ -75,9 +79,8 @@ func CommitAll(message string) {
 	RunMust("commit", "-m", message)
 }
 
-func Tag(tag string) {
-	RunMust("tag", tag)
-	RunMust("push", "origin", tag)
+func Tag(tag, message string) {
+	RunMust("tag", "-a", tag, "-m", message)
 }
 
 func RootDir() (string, error) {

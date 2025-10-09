@@ -20,6 +20,7 @@ type GitKitConfig struct {
 		Base string `yaml:"base"`
 	} `yaml:"prefixes"`
 	Remote string `yaml:"remote"`
+	
 	// AutoSync bool   `yaml:"autoSync"`
 }
 
