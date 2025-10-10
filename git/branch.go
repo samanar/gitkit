@@ -120,7 +120,16 @@ func FinishBranch(branchType, branchName string) {
 		fmt.Fprintf(os.Stderr, "❌ branch '%s' does not exist.\n", branch)
 		os.Exit(1)
 	}
-	MergeBranchToBase(base, branch)
+	err = MergeBranchToBase(base, branch)
+	if err != nil {
+		github := NewGithubRepo()
+		err = github.CreatePR(prefixCfg.Base, branch, "test title", "test body")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "❌ Could not create PR: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
 
 	fmt.Printf("✅ Feature branch '%s' finished and merged into '%s'.\n", branch, base)
 }

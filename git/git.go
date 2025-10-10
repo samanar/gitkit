@@ -62,8 +62,9 @@ func PushWithSetUpstream(branch string) {
 	RunMust("push", "--set-upstream", "origin", branch)
 }
 
-func Merge(branch string) {
-	RunMust("merge", "--no-ff", branch)
+func Merge(branch string) error {
+	_, err := Run("merge", "--no-ff", branch)
+	return err
 }
 
 func MergeWithCommitMessage(branch, commit string) {
@@ -117,14 +118,19 @@ func CreatePrefixedBranch(baseBranch, prefix, branchName string) error {
 	return nil
 }
 
-func MergeBranchToBase(baseBranch, branch string) {
+func MergeBranchToBase(baseBranch, branch string) error {
 	if !BranchExists(branch) {
 		fmt.Fprintf(os.Stderr, "❌ branch '%s' does not exist.\n", branch)
 		os.Exit(1)
 	}
 	Checkout(baseBranch)
 	Pull()
-	Merge(branch)
+	err := Merge(branch)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "❌ Failed to merge branch '%s': %v\n", branch, err)
+		return err
+	}
 	DeleteBranchSafe(branch)
 	Push()
+	return nil
 }

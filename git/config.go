@@ -11,6 +11,7 @@ import (
 )
 
 type GitKitConfig struct {
+	Repo     string `yaml:"repo"`
 	Branches struct {
 		Main    string `yaml:"main"`
 		Develop string `yaml:"develop"`
@@ -20,7 +21,7 @@ type GitKitConfig struct {
 		Base string `yaml:"base"`
 	} `yaml:"prefixes"`
 	Remote string `yaml:"remote"`
-	
+
 	// AutoSync bool   `yaml:"autoSync"`
 }
 

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -37,6 +38,17 @@ var initCmd = &cobra.Command{
 
 		// Ask user inputs with defaults
 		fmt.Println("Let's set up your gitkit configuration:")
+		prompt := promptui.Select{
+			Label: "What is your repository hosting service?",
+			Items: []string{"Github", "Gitlab"},
+		}
+
+		_, result, err := prompt.Run()
+
+		if err != nil {
+			return fmt.Errorf("error getting your hosting service: %v", err)
+		}
+		cfg.Repo = result
 		cfg.Branches.Main = git.Ask("Main branch name", "main")
 		cfg.Branches.Develop = git.Ask("Develop branch name", "develop")
 		cfg.Prefixes = make(map[string]struct {
