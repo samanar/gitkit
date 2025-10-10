@@ -16,9 +16,10 @@ type GithubConfigStruct struct {
 }
 
 type GitlabConfigStruct struct {
-	Username    string `yaml:"username"`
-	AccessToken string `yaml:"accessToken"`
-	Url         string `yaml:"url"`
+	Username       string `yaml:"username"`
+	AccessToken    string `yaml:"accessToken"`
+	Url            string `yaml:"url"`
+	RepositoryName string `yaml:"repositoryName"`
 }
 
 type GitKitRepoConfig struct {
@@ -77,6 +78,23 @@ func (cfg *GitKitRepoConfig) CreateGithub() (GithubConfigStruct, error) {
 	return cfg.Github, nil
 }
 
+func (cfg *GitKitRepoConfig) CreateGitlab() (GitlabConfigStruct, error) {
+	fmt.Println("Let's set up your gitlab configuration:")
+	cfg.Gitlab.Username = Ask("Gitlab Username", "")
+	cfg.Gitlab.AccessToken = Ask("Gitlab Access Token", "")
+	cfg.Gitlab.RepositoryName = Ask("Repository name", "")
+	cfg.Gitlab.Url = Ask("Gitlab URL", "https://gitlab.com")
+	data, err := yaml.Marshal(&cfg)
+	if err != nil {
+		return GitlabConfigStruct{}, err
+	}
+	err = cfg.CreateConfigFile(data)
+	if err != nil {
+		return GitlabConfigStruct{}, err
+	}
+	return cfg.Gitlab, nil
+}
+
 func (cfg *GitKitRepoConfig) CreateConfigFile(data []byte) error {
 	root, err := RootDir()
 	if err != nil {
@@ -101,8 +119,16 @@ func (cfg *GitKitRepoConfig) GetGitHub() (GithubConfigStruct, error) {
 	return gitHubConfig, nil
 }
 
-func (cfg *GitKitRepoConfig) GetGitlab() (*GitlabConfigStruct, error) {
-	return &GitlabConfigStruct{}, fmt.Errorf("method not implemented yet")
+func (cfg *GitKitRepoConfig) GetGitlab() (GitlabConfigStruct, error) {
+	config, err := cfg.Load()
+	if err != nil {
+		return cfg.CreateGitlab()
+	}
+	gitLabConfig := config.Gitlab
+	if gitLabConfig.Username == "" || gitLabConfig.AccessToken == "" || gitLabConfig.Url == "" || gitLabConfig.RepositoryName == "" {
+		return cfg.CreateGitlab()
+	}
+	return gitLabConfig, nil
 }
 
 func (cfg *GitKitRepoConfig) Get(configType GitConfigType) (interface{}, error) {
@@ -121,5 +147,30 @@ func (cfg *GitKitRepoConfig) Get(configType GitConfigType) (interface{}, error) 
 		return gitLabConfig, nil
 	default:
 		return nil, fmt.Errorf("unsopported configType %v", configType)
+	}
+}
+
+func CreatePR(targetBranch, branch, title, body string) error {
+	cfg, err := LoadConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "❌ Could not load .gitkit.yml: %v\n", err)
+		os.Exit(1)
+	}
+
+	switch cfg.Repo {
+	case "Github":
+		github := NewGithubRepo()
+		err = github.CreatePR(targetBranch, branch, title, body)
+		return err
+		// if err != nil {
+		// 	fmt.Fprintf(os.Stderr, "❌ Could not create PR: %v\n", err)
+		// 	os.Exit(1)
+		// }
+	case "Gitlab":
+		github := NewGitlabRepo()
+		err = github.CreateMergeRequest(targetBranch, branch, title, body)
+		return err
+	default:
+		return fmt.Errorf("unsupported repo type: %s", cfg.Repo)
 	}
 }
