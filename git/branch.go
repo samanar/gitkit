@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/manifoldco/promptui"
 )
 
 func CurrentBranch() string {
@@ -122,11 +124,26 @@ func FinishBranch(branchType, branchName string) {
 	}
 	err = MergeBranchToBase(base, branch)
 	if err != nil {
-		github := NewGithubRepo()
-		err = github.CreatePR(prefixCfg.Base, branch, "test title", "test body")
+		prompt := promptui.Prompt{
+			Label:     "Merge failed. Do you want to create a merge request instead(Y,n)?",
+			IsConfirm: true,
+		}
+
+		result, err := prompt.Run()
+
+		if err != nil {
+			fmt.Printf("Prompt failed %v\n", err)
+			return
+		}
+		if result != "y" && result != "Y" && result != "" {
+			os.Exit(1)
+		}
+		err = CreatePR(base, branch, "Merge "+branch+" into "+base, "Auto-generated merge request. finishing branch "+branch)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "❌ Could not create PR: %v\n", err)
 			os.Exit(1)
+		} else {
+			fmt.Printf("✅ Merge request created. %s --> %s\n", branch, base)
 		}
 		return
 	}
