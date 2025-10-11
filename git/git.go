@@ -80,6 +80,41 @@ func MergeSquash(branch string) {
 	RunMust("merge", "--squash", branch)
 }
 
+func Status() {
+	output := RunMust("status", "--porcelain")
+	if output == "" {
+		fmt.Println("✅ Working directory clean!")
+		return
+	}
+	fmt.Println("🔍 Git Status:")
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		if len(line) < 3 {
+			continue
+		}
+		status := line[:2]
+		file := strings.TrimSpace(line[2:])
+		var symbol, desc string
+		switch status {
+		case " M":
+			symbol, desc = "✏️", "Modified"
+		case "A ":
+			symbol, desc = "➕", "Added"
+		case " D":
+			symbol, desc = "❌", "Deleted"
+		case "??":
+			symbol, desc = "🆕", "Untracked"
+		case "R ":
+			symbol, desc = "🔀", "Renamed"
+		case "C ":
+			symbol, desc = "📋", "Copied"
+		default:
+			symbol, desc = "❓", "Other"
+		}
+		fmt.Printf("%s %-10s %s\n", symbol, desc, file)
+	}
+}
+
 func CommitAll(message string) {
 	RunMust("add", "-A")
 	RunMust("commit", "-m", message)
