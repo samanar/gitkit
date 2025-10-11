@@ -115,6 +115,15 @@ func Status() {
 	}
 }
 
+func Add(files ...string) {
+	if len(files) == 0 {
+		RunMust("add", "-A")
+		return
+	}
+	args := append([]string{"add"}, files...)
+	RunMust(args...)
+}
+
 func CommitAll(message string) {
 	RunMust("add", "-A")
 	RunMust("commit", "-m", message)
