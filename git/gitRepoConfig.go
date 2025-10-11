@@ -104,6 +104,13 @@ func (cfg *GitKitRepoConfig) CreateConfigFile(data []byte) error {
 	if err := os.WriteFile(path, data, 0644); err != nil {
 		return err
 	}
+	err = AddToGitignore(PrivateConfigFile)
+	if err != nil {
+		fmt.Printf("⚠️  Could not add %s to .gitignore\n", PrivateConfigFile)
+		fmt.Println("Please add it manually to avoid committing sensitive information.")
+	} else {
+		fmt.Printf("✅ %s added to .gitignore\n", PrivateConfigFile)
+	}
 	return nil
 }
 
