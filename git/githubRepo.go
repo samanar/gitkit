@@ -32,18 +32,20 @@ func (cfg *GithubConfigStruct) getClient() *github.Client {
 	return github.NewClient(tc)
 }
 
-func (cfg *GithubConfigStruct) CreatePR(targetBranch, featureBranch, title, body string) error {
+func (cfg *GithubConfigStruct) CreatePR(targetBranch, branch, title, body string) error {
 	client := cfg.getClient()
 	ctx := context.Background()
+	fmt.Printf("title: %s head: %s base: %s body %s", targetBranch, branch, title, body)
 
 	pr := &github.NewPullRequest{
 		Title: github.String(title),
-		Head:  github.String(featureBranch),
+		Head:  github.String(branch),
 		Base:  github.String(targetBranch),
 		Body:  github.String(body),
 	}
+	fmt.Printf("title: %s head: %s base: %s body %s", pr.Title, pr.Head, pr.Base, pr.Body)
 
-	log.Printf("🔄 Creating PR: %s → %s/%s:%s\n", featureBranch, cfg.Username, cfg.RepositoryName, targetBranch)
+	log.Printf("🔄 Creating PR: %s → %s/%s:%s\n", branch, cfg.Username, cfg.RepositoryName, targetBranch)
 
 	newPR, resp, err := client.PullRequests.Create(ctx, cfg.Username, cfg.RepositoryName, pr)
 	if err != nil {

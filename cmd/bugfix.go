@@ -29,7 +29,7 @@ var bugFixFinishCmd = &cobra.Command{
 	Short:   "Finish the current Bugfix",
 	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		var branchName string = ""
+		var branchName string = git.CurrentBranch()
 		if len(args) == 1 {
 			branchName = args[0]
 		}

@@ -30,7 +30,7 @@ var hotFixEndCmd = &cobra.Command{
 	Aliases: []string{"f", "end", "complete"},
 	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		var branchName string = ""
+		var branchName string = git.CurrentBranch()
 		if len(args) == 1 {
 			branchName = args[0]
 		}

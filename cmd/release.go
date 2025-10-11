@@ -77,7 +77,7 @@ var releaseEndCmd = &cobra.Command{
 		// # 6. Delete the release branch
 		git.DeleteBranchSafe(branchName)
 
-		// # 7. Push everything (branches + tags)
+		// # 7. Push everything (tbranches + tags)
 		// git push origin develop main --tags
 		git.RunMust("push", "origin", developBranch, mainBranch, "--tags")
 		fmt.Printf("✅ Finished release: %s'.\n", branchName)

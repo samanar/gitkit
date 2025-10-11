@@ -122,6 +122,8 @@ func FinishBranch(branchType, branchName string) {
 		fmt.Fprintf(os.Stderr, "❌ branch '%s' does not exist.\n", branch)
 		os.Exit(1)
 	}
+	Checkout(branch)
+	Push()
 	err = MergeBranchToBase(base, branch)
 	if err != nil {
 		prompt := promptui.Prompt{
@@ -138,7 +140,7 @@ func FinishBranch(branchType, branchName string) {
 		if result != "y" && result != "Y" && result != "" {
 			os.Exit(1)
 		}
-		err = CreatePR(base, branch, "Merge "+branch+" into "+base, "Auto-generated merge request. finishing branch "+branch)
+		err = CreatePR(base, branch, "Merge request "+branch, "automatic merge request from "+branch+"to "+base)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "❌ Could not create PR: %v\n", err)
 			os.Exit(1)

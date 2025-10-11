@@ -33,7 +33,12 @@ func RunMust(args ...string) string {
 }
 
 func Push() {
-	RunMust("push")
+	cfg, err := LoadConfig()
+	if err != nil {
+		RunMust("push")
+	} else {
+		RunMust("push", "-u", cfg.Remote, CurrentBranch())
+	}
 }
 
 func Pull() {

@@ -17,7 +17,8 @@ func NewGitlabRepo() *GitlabConfigStruct {
 
 func (cfg *GitlabConfigStruct) CreateMergeRequest(targetBranch, sourceBranch, title, description string) error {
 	apiURL, err := url.JoinPath(cfg.Url, "api/v4", "projects",
-		url.PathEscape(fmt.Sprintf("%s%%2F%s", cfg.Username, cfg.RepositoryName)), "merge_requests")
+		url.PathEscape(fmt.Sprintf("%s/%s", cfg.Username, cfg.RepositoryName)), "merge_requests")
+	fmt.Println(apiURL)
 	if err != nil {
 		return fmt.Errorf("failed to build API URL: %w", err)
 	}
