@@ -2,3 +2,4 @@
 .gitkit_private.yml
 gitkit
 .vscode
+.gomodcache

@@ -170,3 +170,19 @@ func (g *GitCmd) MergeBranchToBase(baseBranch, branch string) error {
 	g.Push()
 	return nil
 }
+
+func (g *GitCmd) Stash(args ...string) {
+	stashArgs := append([]string{"stash"}, args...)
+	output := g.RunMust(stashArgs...)
+	if strings.TrimSpace(output) != "" {
+		fmt.Print(output)
+	}
+}
+
+func (g *GitCmd) StashPop(args ...string) {
+	stashArgs := append([]string{"stash", "pop"}, args...)
+	output := g.RunMust(stashArgs...)
+	if strings.TrimSpace(output) != "" {
+		fmt.Print(output)
+	}
+}
