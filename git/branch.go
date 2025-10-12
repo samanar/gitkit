@@ -2,10 +2,11 @@ package git
 
 import (
 	"fmt"
-	"gitkit/config"
-	"gitkit/repo"
 	"os"
 	"strings"
+
+	"github.com/samanar/gitkit/config"
+	"github.com/samanar/gitkit/repo"
 
 	"github.com/manifoldco/promptui"
 )

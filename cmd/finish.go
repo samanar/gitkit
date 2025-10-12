@@ -4,8 +4,9 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"gitkit/git"
 	"strings"
+
+	"github.com/samanar/gitkit/git"
 
 	"github.com/spf13/cobra"
 )

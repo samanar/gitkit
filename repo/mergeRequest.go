@@ -2,7 +2,8 @@ package repo
 
 import (
 	"fmt"
-	"gitkit/config"
+
+	"github.com/samanar/gitkit/config"
 )
 
 func MergeRequest(rootPath string, repoType config.GitRepoType, title, description, sourceBranch, targetBranch string) error {

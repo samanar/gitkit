@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"gitkit/config"
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/samanar/gitkit/config"
 )
 
 type GitlabRepo struct {

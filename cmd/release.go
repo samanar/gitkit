@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"gitkit/git"
 	"os"
+
+	"github.com/samanar/gitkit/git"
 
 	"github.com/spf13/cobra"
 )

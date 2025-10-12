@@ -1,6 +1,6 @@
 package main
 
-import "gitkit/cmd"
+import "github.com/samanar/gitkit/cmd"
 
 func main() {
 	cmd.Execute()

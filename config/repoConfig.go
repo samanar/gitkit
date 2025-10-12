@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-	"gitkit/gitignore"
 	"os"
 	"path/filepath"
+
+	"github.com/samanar/gitkit/gitignore"
 
 	"gopkg.in/yaml.v3"
 )

@@ -1,6 +1,6 @@
 package git
 
-import "gitkit/config"
+import "github.com/samanar/gitkit/config"
 
 type GitCmd struct {
 	Config config.GitKitConfig

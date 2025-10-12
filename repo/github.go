@@ -3,9 +3,10 @@ package repo
 import (
 	"context"
 	"fmt"
-	"gitkit/config"
 	"log"
 	"strings"
+
+	"github.com/samanar/gitkit/config"
 
 	"github.com/google/go-github/v41/github"
 	"golang.org/x/oauth2"

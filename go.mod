@@ -1,4 +1,4 @@
-module gitkit
+module github.com/samanar/gitkit
 
 go 1.25.1
 
