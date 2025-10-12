@@ -1,23 +1,28 @@
-package git
+package repo
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"gitkit/config"
 	"io"
 	"net/http"
 	"net/url"
 )
 
-func NewGitlabRepo() *GitlabConfigStruct {
-	cfg := NewGitKitRepoConfig()
-	cfg.GetGitlab()
-	return &cfg.Gitlab
+type GitlabRepo struct {
+	Config config.RepoConfig
 }
 
-func (cfg *GitlabConfigStruct) CreateMergeRequest(targetBranch, sourceBranch, title, description string) error {
-	apiURL, err := url.JoinPath(cfg.Url, "api/v4", "projects",
-		url.PathEscape(fmt.Sprintf("%s/%s", cfg.Username, cfg.RepositoryName)), "merge_requests")
+func NewGitlabRepo(rootPath string) GitlabRepo {
+	gitlabRepo := GitlabRepo{}
+	gitlabRepo.Config = config.NewGitKitRepoConfig(rootPath, config.Gitlab)
+	return gitlabRepo
+}
+
+func (repo *GitlabRepo) CreateMergeRequest(targetBranch, sourceBranch, title, description string) error {
+	apiURL, err := url.JoinPath(repo.Config.Url, "api/v4", "projects",
+		url.PathEscape(fmt.Sprintf("%s/%s", repo.Config.Username, repo.Config.RepositoryName)), "merge_requests")
 	fmt.Println(apiURL)
 	if err != nil {
 		return fmt.Errorf("failed to build API URL: %w", err)
@@ -36,7 +41,7 @@ func (cfg *GitlabConfigStruct) CreateMergeRequest(targetBranch, sourceBranch, ti
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
-	req.Header.Set("Private-Token", cfg.AccessToken)
+	req.Header.Set("Private-Token", repo.Config.AccessToken)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
@@ -57,7 +62,6 @@ func (cfg *GitlabConfigStruct) CreateMergeRequest(targetBranch, sourceBranch, ti
 		return nil
 	}
 
-	// Error handling by status
 	switch resp.StatusCode {
 	case 400:
 		return fmt.Errorf("bad request: %s", string(respBody))

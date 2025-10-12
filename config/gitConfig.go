@@ -1,7 +1,6 @@
-package git
+package config
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,6 +9,8 @@ import (
 	"github.com/manifoldco/promptui"
 	"gopkg.in/yaml.v3"
 )
+
+const GITKIT_CONFIG_FILE = ".gitkit.yaml"
 
 type GitKitConfig struct {
 	Repo     string `yaml:"repo"`
@@ -22,18 +23,48 @@ type GitKitConfig struct {
 		Base string `yaml:"base"`
 	} `yaml:"prefixes"`
 	Remote string `yaml:"remote"`
-
-	// AutoSync bool   `yaml:"autoSync"`
 }
 
-func CreateConfig() error {
-	repoRoot, err := RootDir()
+func NewGitConfig(rootPath string, replaceConfig bool) GitKitConfig {
+	gitConfig := GitKitConfig{}
+	if replaceConfig {
+		gitConfig.Create(rootPath)
+	}
+	gitConfig.Load(rootPath, replaceConfig)
+	return gitConfig
+}
+
+func (cfg *GitKitConfig) Exists(rootPath string) bool {
+	configPath := filepath.Join(rootPath, GITKIT_CONFIG_FILE)
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
+func (cfg *GitKitConfig) Load(rootPath string, replaceConfig bool) error {
+	if !cfg.Exists(rootPath) {
+		cfg.Create(rootPath)
+	}
+	configPath := filepath.Join(rootPath, GITKIT_CONFIG_FILE)
+	data, err := os.ReadFile(configPath)
 	if err != nil {
-		return fmt.Errorf("not a git repository: %v", err)
+		err = cfg.Create(rootPath)
+		if err != nil {
+			return err
+		}
 	}
 
-	cfgPath := filepath.Join(repoRoot, ".gitkit.yml")
+	var gitkitCfg GitKitConfig
+	if err := yaml.Unmarshal(data, &gitkitCfg); err != nil {
+		return err
+	}
+	cfg = &gitkitCfg
+	return nil
+}
 
+func (cfg *GitKitConfig) Create(rootPath string) error {
+	cfgPath := filepath.Join(rootPath, GITKIT_CONFIG_FILE)
 	if _, err := os.Stat(cfgPath); err == nil {
 		fmt.Printf("⚠️  Config file already exists at %s\n", cfgPath)
 		fmt.Print("Do you want to overwrite it? (y/N): ")
@@ -44,7 +75,7 @@ func CreateConfig() error {
 		}
 	}
 
-	cfg := GitKitConfig{}
+	gitkitConfig := GitKitConfig{}
 
 	// Ask user inputs with defaults
 	fmt.Println("Let's set up your gitkit configuration:")
@@ -58,45 +89,45 @@ func CreateConfig() error {
 	if err != nil {
 		return fmt.Errorf("error getting your hosting service: %v", err)
 	}
-	cfg.Repo = result
-	cfg.Branches.Main = Ask("Main branch name", "main")
-	cfg.Branches.Develop = Ask("Develop branch name", "develop")
-	cfg.Prefixes = make(map[string]struct {
+	gitkitConfig.Repo = result
+	gitkitConfig.Branches.Main = Ask("Main branch name", "main")
+	gitkitConfig.Branches.Develop = Ask("Develop branch name", "develop")
+	gitkitConfig.Prefixes = make(map[string]struct {
 		Name string `yaml:"name"`
 		Base string `yaml:"base"`
 	})
-	cfg.Prefixes["feature"] = struct {
+	gitkitConfig.Prefixes["feature"] = struct {
 		Name string `yaml:"name"`
 		Base string `yaml:"base"`
 	}{
 		Name: Ask("Feature prefix", "feature/"),
-		Base: cfg.Branches.Develop,
+		Base: gitkitConfig.Branches.Develop,
 	}
-	cfg.Prefixes["bugFix"] = struct {
+	gitkitConfig.Prefixes["bugFix"] = struct {
 		Name string `yaml:"name"`
 		Base string `yaml:"base"`
 	}{
 		Name: Ask("Bugfix prefix", "bugfix/"),
-		Base: cfg.Branches.Develop,
+		Base: gitkitConfig.Branches.Develop,
 	}
-	cfg.Prefixes["hotFix"] = struct {
+	gitkitConfig.Prefixes["hotFix"] = struct {
 		Name string `yaml:"name"`
 		Base string `yaml:"base"`
 	}{
 		Name: Ask("Hotfix prefix", "hotfix/"),
-		Base: cfg.Branches.Main,
+		Base: gitkitConfig.Branches.Main,
 	}
-	cfg.Prefixes["release"] = struct {
+	gitkitConfig.Prefixes["release"] = struct {
 		Name string `yaml:"name"`
 		Base string `yaml:"base"`
 	}{
 		Name: Ask("Release prefix", "release/"),
-		Base: cfg.Branches.Develop,
+		Base: gitkitConfig.Branches.Develop,
 	}
-	cfg.Remote = Ask("Remote name", "origin")
+	gitkitConfig.Remote = Ask("Remote name", "origin")
 
 	// Save YAML file
-	data, err := yaml.Marshal(&cfg)
+	data, err := yaml.Marshal(&gitkitConfig)
 	if err != nil {
 		return err
 	}
@@ -107,42 +138,4 @@ func CreateConfig() error {
 
 	fmt.Printf("✅ Configuration saved to %s\n", cfgPath)
 	return nil
-}
-
-func LoadConfig() (*GitKitConfig, error) {
-	root, err := RootDir()
-	if err != nil {
-		return nil, err
-	}
-
-	path := filepath.Join(root, ".gitkit.yml")
-	data, err := os.ReadFile(path)
-	if err != nil {
-		err = CreateConfig()
-		if err != nil {
-			return nil, err
-		}
-		return LoadConfig()
-	}
-
-	var cfg GitKitConfig
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil, err
-	}
-	return &cfg, nil
-}
-
-func ReadLine() string {
-	reader := bufio.NewReader(os.Stdin)
-	text, _ := reader.ReadString('\n')
-	return strings.TrimSpace(text)
-}
-
-func Ask(question, def string) string {
-	fmt.Printf("%s [%s]: ", question, def)
-	answer := ReadLine()
-	if answer == "" {
-		return def
-	}
-	return answer
 }

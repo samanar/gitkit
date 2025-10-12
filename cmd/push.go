@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"gitkit/git"
 
 	"github.com/spf13/cobra"
@@ -10,11 +9,10 @@ import (
 // pushCmd represents the push command
 var pushCmd = &cobra.Command{
 	Use:   "push",
-	Short: "A brief description of your command",
-
+	Short: "git push",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("📤 Pushing local commits...")
-		git.Push()
+		gitCmd := git.NewGitCmdWithoutConfig()
+		gitCmd.Push()
 	},
 }
 

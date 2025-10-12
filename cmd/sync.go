@@ -13,13 +13,9 @@ var syncCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("🔄 Syncing with remote...")
-
-		fmt.Println("📥 Pulling latest changes...")
-		git.Pull()
-
-		fmt.Println("📤 Pushing local commits...")
-		git.Push()
-
+		gitCmd := git.NewGitCmdWithoutConfig()
+		gitCmd.Pull()
+		gitCmd.Push()
 		fmt.Println("✅ Sync complete.")
 	},
 }

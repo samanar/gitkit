@@ -12,15 +12,15 @@ import (
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "git add",
-
 	Run: func(cmd *cobra.Command, args []string) {
+		gitCmd := git.NewGitCmdWithoutConfig()
 		var files []string
 		for i, arg := range args {
 			if i > 0 {
 				files = append(files, arg)
 			}
 		}
-		git.Add(files...)
+		gitCmd.Add(files...)
 	},
 }
 

@@ -15,7 +15,8 @@ var statusCmd = &cobra.Command{
 	Short: "git status",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		git.Status()
+		gitCmd := git.NewGitCmdWithoutConfig()
+		gitCmd.Status()
 	},
 }
 

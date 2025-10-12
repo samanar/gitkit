@@ -22,7 +22,8 @@ var featureStartCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		branchName := args[0]
-		git.StartBranch("feature", branchName)
+		gitCmd := git.NewGitCommandWithConfig(false)
+		gitCmd.StartBranch("feature", branchName)
 	},
 }
 
@@ -33,11 +34,12 @@ var featureEndCmd = &cobra.Command{
 	Aliases: []string{"f", "end", "complete"},
 	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		var branchName string = git.CurrentBranch()
+		gitCmd := git.NewGitCommandWithConfig(false)
+		var branchName string = gitCmd.CurrentBranch()
 		if len(args) == 1 {
 			branchName = args[0]
 		}
-		git.FinishBranch("feature", branchName)
+		gitCmd.FinishBranch("feature", branchName)
 	},
 }
 

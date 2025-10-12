@@ -1,4 +1,4 @@
-package git
+package gitignore
 
 import (
 	"bufio"
@@ -34,13 +34,9 @@ func lineExistsInFile(path, target string) (bool, error) {
 	return false, scanner.Err()
 }
 
-func AddToGitignore(target string) error {
-	root, err := RootDir()
-	if err != nil {
-		return err
-	}
-	gitignorePath := filepath.Join(root, ".gitignore")
-	err = ensureFileExists(gitignorePath)
+func AddToGitignore(rootPath, target string) error {
+	gitignorePath := filepath.Join(rootPath, ".gitignore")
+	err := ensureFileExists(gitignorePath)
 	if err != nil {
 		return err
 	}

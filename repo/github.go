@@ -1,8 +1,9 @@
-package git
+package repo
 
 import (
 	"context"
 	"fmt"
+	"gitkit/config"
 	"log"
 	"strings"
 
@@ -10,19 +11,23 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func NewGithubRepo() *GithubConfigStruct {
-	cfg := NewGitKitRepoConfig()
-	cfg.GetGitHub()
-	return &cfg.Github
+type GithubRepo struct {
+	Config config.RepoConfig
 }
 
-func (cfg *GithubConfigStruct) getClient() *github.Client {
+func NewGithubRepo(rootPath string) GithubRepo {
+	githubRepo := GithubRepo{}
+	githubRepo.Config = config.NewGitKitRepoConfig(rootPath, config.Github)
+	return githubRepo
+}
+
+func (repo *GithubRepo) getClient() *github.Client {
 	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.AccessToken})
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: repo.Config.AccessToken})
 	tc := oauth2.NewClient(ctx, ts)
 
-	if cfg.Url != "" {
-		client, err := github.NewEnterpriseClient(cfg.Url, cfg.Url, tc)
+	if repo.Config.Url != "" {
+		client, err := github.NewEnterpriseClient(repo.Config.Url, repo.Config.Url, tc)
 		if err != nil {
 			log.Fatalf("Failed to create GitHub Enterprise client: %v", err)
 		}
@@ -32,8 +37,8 @@ func (cfg *GithubConfigStruct) getClient() *github.Client {
 	return github.NewClient(tc)
 }
 
-func (cfg *GithubConfigStruct) CreatePR(targetBranch, branch, title, body string) error {
-	client := cfg.getClient()
+func (repo *GithubRepo) CreatePR(targetBranch, branch, title, body string) error {
+	client := repo.getClient()
 	ctx := context.Background()
 	fmt.Printf("title: %s head: %s base: %s body %s", targetBranch, branch, title, body)
 
@@ -45,9 +50,9 @@ func (cfg *GithubConfigStruct) CreatePR(targetBranch, branch, title, body string
 	}
 	fmt.Printf("title: %s head: %s base: %s body %s", pr.Title, pr.Head, pr.Base, pr.Body)
 
-	log.Printf("🔄 Creating PR: %s → %s/%s:%s\n", branch, cfg.Username, cfg.RepositoryName, targetBranch)
+	log.Printf("🔄 Creating PR: %s → %s/%s:%s\n", branch, repo.Config.Username, repo.Config.RepositoryName, targetBranch)
 
-	newPR, resp, err := client.PullRequests.Create(ctx, cfg.Username, cfg.RepositoryName, pr)
+	newPR, resp, err := client.PullRequests.Create(ctx, repo.Config.Username, repo.Config.RepositoryName, pr)
 	if err != nil {
 		if resp != nil && resp.StatusCode == 422 {
 			return fmt.Errorf("PR creation failed (possibly duplicate PR or invalid branch): %w", err)
@@ -56,7 +61,7 @@ func (cfg *GithubConfigStruct) CreatePR(targetBranch, branch, title, body string
 			return fmt.Errorf("authentication failed: check your GitHub token in config.json")
 		}
 		if strings.Contains(err.Error(), "404") {
-			return fmt.Errorf("repository not found or no access to %s/%s", cfg.Username, cfg.RepositoryName)
+			return fmt.Errorf("repository not found or no access to %s/%s", repo.Config.Username, repo.Config.RepositoryName)
 		}
 		return fmt.Errorf("failed to create PR: %w", err)
 	}
