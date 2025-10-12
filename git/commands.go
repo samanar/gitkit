@@ -171,6 +171,22 @@ func (g *GitCmd) MergeBranchToBase(baseBranch, branch string) error {
 	return nil
 }
 
+func (g *GitCmd) Reset(args ...string) {
+	resetArgs := append([]string{"reset"}, args...)
+	output := g.RunMust(resetArgs...)
+	if strings.TrimSpace(output) != "" {
+		fmt.Print(output)
+	}
+}
+
+func (g *GitCmd) Restore(args ...string) {
+	restoreArgs := append([]string{"restore"}, args...)
+	output := g.RunMust(restoreArgs...)
+	if strings.TrimSpace(output) != "" {
+		fmt.Print(output)
+	}
+}
+
 func (g *GitCmd) Stash(args ...string) {
 	stashArgs := append([]string{"stash"}, args...)
 	output := g.RunMust(stashArgs...)
