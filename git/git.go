@@ -183,3 +183,10 @@ func MergeBranchToBase(baseBranch, branch string) error {
 	Push()
 	return nil
 }
+
+func Clone(repoURL string) error {
+	cmd := exec.Command("git", "clone", repoURL)
+	cmd.Stdout = nil
+	cmd.Stderr = nil
+	return cmd.Run()
+}
