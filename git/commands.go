@@ -34,7 +34,7 @@ func (g *GitCmd) RunMust(args ...string) string {
 
 func (g *GitCmd) Push() {
 	fmt.Println("📤 Pushing local commits...")
-	if g.config.Remote == "" {
+	if g.Config.Remote == "" {
 		g.RunMust("push")
 		return
 	}

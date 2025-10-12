@@ -55,7 +55,6 @@ func (g *GitCmd) DeleteBranchSafe(branch string) {
 
 func (g *GitCmd) Checkout(branch string) {
 	g.RunMust("checkout", branch)
-	g.Pull()
 }
 
 func (g *GitCmd) RemovePrefix(branch, prefix string) string {
@@ -114,8 +113,7 @@ func (g *GitCmd) FinishBranch(branchType, branchName string) {
 		fmt.Fprintf(os.Stderr, "❌ branch '%s' does not exist.\n", branch)
 		os.Exit(1)
 	}
-	g.Checkout(branch)
-	g.Push()
+
 	err := g.MergeBranchToBase(base, branch)
 	if err != nil {
 		prompt := promptui.Prompt{
@@ -132,6 +130,9 @@ func (g *GitCmd) FinishBranch(branchType, branchName string) {
 		if result != "y" && result != "Y" && result != "" {
 			os.Exit(1)
 		}
+		g.Checkout(branch)
+		fmt.Println("current branch is", g.CurrentBranch())
+		g.Push()
 		repoType := config.Github
 		if g.Config.Repo == "Gitlab" {
 			repoType = config.Gitlab
