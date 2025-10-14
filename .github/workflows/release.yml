@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
 
 permissions:
@@ -41,11 +41,33 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.25.1'
+          go-version: "1.25.1"
+
+      - name: Install UPX
+        run: |
+          wget -q https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-amd64_linux.tar.xz
+          tar -xf upx-4.2.4-amd64_linux.tar.xz
+          sudo mv upx-4.2.4-amd64_linux/upx /usr/local/bin/
+          upx --version
 
       - name: Build binary
         run: |
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags="-s -w" -o gitkit-${{ matrix.name }} main.go
+          CGO_ENABLED=0 GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build \
+            -a \
+            -installsuffix cgo \
+            -mod=readonly \
+            -ldflags="-s -w -X main.version=${{ github.ref_name }} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            -trimpath \
+            -tags netgo \
+            -o gitkit-${{ matrix.name }} \
+            main.go
+
+      - name: Compress binary
+        run: |
+          if [ "${{ matrix.os }}" != "windows" ]; then
+            chmod +x gitkit-${{ matrix.name }}
+          fi
+          upx --best --lzma gitkit-${{ matrix.name }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -68,15 +90,13 @@ jobs:
         with:
           path: artifacts/
 
-      - name: Create release archives
+      - name: Prepare release assets
         run: |
+          mkdir -p release-assets
           cd artifacts/
-          for dir in */; do
-            if [ -d "$dir" ]; then
-              tar -czf "${dir%/}.tar.gz" -C "$dir" .
-            fi
-          done
-          ls -la *.tar.gz
+          find . -name "gitkit-*" -type f -exec cp {} ../release-assets/ \;
+          cd ../release-assets
+          ls -la
 
       - name: Generate changelog
         id: changelog
@@ -114,12 +134,21 @@ jobs:
 
             Download the appropriate binary for your platform from the assets below.
 
+            **Installation:**
+            ```bash
+            # Download the binary for your platform
+            # Make it executable (Linux/macOS)
+            chmod +x gitkit-*
+            # Move to your PATH
+            sudo mv gitkit-* /usr/local/bin/gitkit
+            ```
+
             **Supported Platforms:**
             - Linux (amd64, arm64)
             - macOS (amd64, arm64)
             - Windows (amd64)
           draft: false
           prerelease: ${{ contains(github.ref_name, 'rc') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
-          files: ./artifacts/*.tar.gz
+          files: ./release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

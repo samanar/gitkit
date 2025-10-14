@@ -50,7 +50,18 @@ sudo mv gitkit /usr/local/bin/
 
 Download the latest release from [GitHub Releases](https://github.com/samanar/gitkit/releases).
 
+**Installation:**
+
+```bash
+# Download the binary for your platform
+# Make it executable (Linux/macOS)
+chmod +x gitkit-*
+# Move to your PATH
+sudo mv gitkit-* /usr/local/bin/gitkit
+```
+
 **Supported Platforms:**
+
 - Linux (amd64, arm64)
 - macOS (amd64, arm64)
 - Windows (amd64)
@@ -294,12 +305,14 @@ var myCmd = &cobra.Command{
 GitKit uses automated GitHub Actions for releases:
 
 1. **Create a release commit:**
+
    ```bash
    gitkit commit "Release v1.2.0"
    gitkit push
    ```
 
 2. **Create and push a version tag:**
+
    ```bash
    git tag v1.2.0
    git push origin v1.2.0
