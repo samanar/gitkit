@@ -30,7 +30,10 @@ func NewGitConfig(rootPath string, replaceConfig bool) GitKitConfig {
 	if replaceConfig {
 		gitConfig.Create(rootPath)
 	}
-	gitConfig.Load(rootPath, replaceConfig)
+	err := gitConfig.Load(rootPath, replaceConfig)
+	if err != nil {
+		panic(err)
+	}
 	return gitConfig
 }
 
@@ -59,7 +62,7 @@ func (cfg *GitKitConfig) Load(rootPath string, replaceConfig bool) error {
 	if err := yaml.Unmarshal(data, &gitkitCfg); err != nil {
 		return err
 	}
-	cfg = &gitkitCfg
+	*cfg = gitkitCfg
 	return nil
 }
 

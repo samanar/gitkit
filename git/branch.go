@@ -85,7 +85,6 @@ func (g *GitCmd) StartBranch(branchType, branchName string) {
 
 	g.Sync(prefixCfg.Base)
 
-	// // Use reusable method to create the branch
 	if err := g.CreatePrefixedBranch(prefixCfg.Base, prefixCfg.Name, branchName); err != nil {
 		fmt.Fprintf(os.Stderr, "❌ %v\n", err)
 		os.Exit(1)

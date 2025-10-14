@@ -19,6 +19,7 @@ var releaseStartCmd = &cobra.Command{
 	Use:     "start",
 	Aliases: []string{"s", "new", "begin"},
 	Short:   "Start a new release",
+	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		gitCmd := git.NewGitCommandWithConfig(false)
 		branchName := args[0]
