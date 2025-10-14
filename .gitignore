@@ -3,4 +3,4 @@
 gitkit
 .vscode
 .gomodcache
-.github
+.github/copilot-instructions.md

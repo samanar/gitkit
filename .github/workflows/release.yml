@@ -1,0 +1,174 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+            name: linux-amd64
+          - os: linux
+            arch: arm64
+            name: linux-arm64
+          - os: darwin
+            arch: amd64
+            name: darwin-amd64
+          - os: darwin
+            arch: arm64
+            name: darwin-arm64
+          - os: windows
+            arch: amd64
+            name: windows-amd64.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25.1'
+
+      - name: Build binary
+        run: |
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags="-s -w" -o gitkit-${{ matrix.name }} main.go
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitkit-${{ matrix.name }}
+          path: gitkit-${{ matrix.name }}
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Create release archives
+        run: |
+          cd artifacts/
+          for dir in */; do
+            if [ -d "$dir" ]; then
+              tar -czf "${dir%/}.tar.gz" -C "$dir" .
+            fi
+          done
+          ls -la *.tar.gz
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
+
+          # Get commits since last tag
+          if git describe --tags >/dev/null 2>&1; then
+            CHANGES=$(git log --pretty=format:"* %s (%h)" "${LATEST_TAG}..HEAD" 2>/dev/null || echo "* Initial release")
+          else
+            CHANGES="* Initial release"
+          fi
+
+          # Escape newlines for GitHub output
+          CHANGES="${CHANGES//'%'/'%25'}"
+          CHANGES="${CHANGES//$'\n'/'%0A'}"
+          CHANGES="${CHANGES//$'\r'/'%0D'}"
+
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            ## Changes
+
+            ${{ steps.changelog.outputs.changes }}
+
+            ## Downloads
+
+            Download the appropriate binary for your platform from the assets below.
+
+            **Supported Platforms:**
+            - Linux (amd64, arm64)
+            - macOS (amd64, arm64)
+            - Windows (amd64)
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'rc') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/gitkit-linux-amd64.tar.gz
+          asset_name: gitkit-linux-amd64.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload release assets (Linux ARM64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/gitkit-linux-arm64.tar.gz
+          asset_name: gitkit-linux-arm64.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload release assets (macOS AMD64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/gitkit-darwin-amd64.tar.gz
+          asset_name: gitkit-darwin-amd64.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload release assets (macOS ARM64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/gitkit-darwin-arm64.tar.gz
+          asset_name: gitkit-darwin-arm64.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload release assets (Windows AMD64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/gitkit-windows-amd64.exe.tar.gz
+          asset_name: gitkit-windows-amd64.tar.gz
+          asset_content_type: application/gzip

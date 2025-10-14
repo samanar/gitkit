@@ -46,6 +46,15 @@ go build -o gitkit main.go
 sudo mv gitkit /usr/local/bin/
 ```
 
+### Download Pre-built Binaries
+
+Download the latest release from [GitHub Releases](https://github.com/samanar/gitkit/releases).
+
+**Supported Platforms:**
+- Linux (amd64, arm64)
+- macOS (amd64, arm64)
+- Windows (amd64)
+
 ## Quick Start
 
 1. **Initialize GitKit in your repository:**
@@ -279,6 +288,32 @@ var myCmd = &cobra.Command{
     },
 }
 ```
+
+### Creating Releases
+
+GitKit uses automated GitHub Actions for releases:
+
+1. **Create a release commit:**
+   ```bash
+   gitkit commit "Release v1.2.0"
+   gitkit push
+   ```
+
+2. **Create and push a version tag:**
+   ```bash
+   git tag v1.2.0
+   git push origin v1.2.0
+   ```
+
+3. **GitHub Actions will automatically:**
+   - Build binaries for Linux, macOS, and Windows
+   - Create a GitHub release
+   - Upload all platform binaries
+   - Generate changelog from commits
+
+**Tag Format:** Use semantic versioning (e.g., `v1.2.0`, `v2.0.0-rc.1`)
+
+**Pre-releases:** Tags containing `rc`, `beta`, or `alpha` are marked as pre-releases
 
 ## Contributing
 
