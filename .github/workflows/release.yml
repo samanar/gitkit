@@ -101,12 +101,10 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           body: |
             ## Changes
 
@@ -122,53 +120,6 @@ jobs:
             - Windows (amd64)
           draft: false
           prerelease: ${{ contains(github.ref_name, 'rc') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
-
-      - name: Upload release assets
-        uses: actions/upload-release-asset@v1
+          files: ./artifacts/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/gitkit-linux-amd64.tar.gz
-          asset_name: gitkit-linux-amd64.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload release assets (Linux ARM64)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/gitkit-linux-arm64.tar.gz
-          asset_name: gitkit-linux-arm64.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload release assets (macOS AMD64)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/gitkit-darwin-amd64.tar.gz
-          asset_name: gitkit-darwin-amd64.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload release assets (macOS ARM64)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/gitkit-darwin-arm64.tar.gz
-          asset_name: gitkit-darwin-arm64.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload release assets (Windows AMD64)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/gitkit-windows-amd64.exe.tar.gz
-          asset_name: gitkit-windows-amd64.tar.gz
-          asset_content_type: application/gzip
