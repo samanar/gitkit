@@ -16,7 +16,7 @@ var finishCmd = &cobra.Command{
 	Use:   "finish",
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
-		gitCmd := git.NewGitCommandWithConfig(false)
+		gitCmd := git.NewGitCommandWithConfig()
 		currentBranch := gitCmd.CurrentBranch()
 		branchType := ""
 		for key, branch := range gitCmd.Config.Prefixes {

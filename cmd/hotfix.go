@@ -19,7 +19,7 @@ var hotFixStartCmd = &cobra.Command{
 	Aliases: []string{"s", "new", "begin"},
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		gitCmd := git.NewGitCommandWithConfig(false)
+		gitCmd := git.NewGitCommandWithConfig()
 		branchName := args[0]
 		gitCmd.StartBranch("hotFix", branchName)
 	},
@@ -31,7 +31,7 @@ var hotFixEndCmd = &cobra.Command{
 	Aliases: []string{"f", "end", "complete"},
 	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		gitCmd := git.NewGitCommandWithConfig(false)
+		gitCmd := git.NewGitCommandWithConfig()
 		var branchName string = gitCmd.CurrentBranch()
 		if len(args) == 1 {
 			branchName = args[0]

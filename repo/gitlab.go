@@ -24,7 +24,6 @@ func NewGitlabRepo(rootPath string) GitlabRepo {
 func (repo *GitlabRepo) CreateMergeRequest(targetBranch, sourceBranch, title, description string) error {
 	apiURL, err := url.JoinPath(repo.Config.Url, "api/v4", "projects",
 		url.PathEscape(fmt.Sprintf("%s/%s", repo.Config.Username, repo.Config.RepositoryName)), "merge_requests")
-	fmt.Println(apiURL)
 	if err != nil {
 		return fmt.Errorf("failed to build API URL: %w", err)
 	}

@@ -21,7 +21,7 @@ var releaseStartCmd = &cobra.Command{
 	Short:   "Start a new release",
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		gitCmd := git.NewGitCommandWithConfig(false)
+		gitCmd := git.NewGitCommandWithConfig()
 		branchName := args[0]
 		gitCmd.StartBranch("release", branchName)
 	},
@@ -33,7 +33,7 @@ var releaseEndCmd = &cobra.Command{
 	Aliases: []string{"f", "end", "complete"},
 	Short:   "End the current release",
 	Run: func(cmd *cobra.Command, args []string) {
-		gitCmd := git.NewGitCommandWithConfig(false)
+		gitCmd := git.NewGitCommandWithConfig()
 		var branchName string = gitCmd.CurrentBranch()
 		if len(args) == 1 {
 			branchName = args[0]

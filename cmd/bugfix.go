@@ -18,7 +18,7 @@ var bugFixStartCmd = &cobra.Command{
 	Aliases: []string{"s", "new", "begin"},
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		gitCmd := git.NewGitCommandWithConfig(false)
+		gitCmd := git.NewGitCommandWithConfig()
 		branchName := args[0]
 		gitCmd.StartBranch("bugFix", branchName)
 	},
@@ -30,7 +30,7 @@ var bugFixFinishCmd = &cobra.Command{
 	Short:   "Finish the current Bugfix",
 	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		gitCmd := git.NewGitCommandWithConfig(false)
+		gitCmd := git.NewGitCommandWithConfig()
 		var branchName string = gitCmd.CurrentBranch()
 		if len(args) == 1 {
 			branchName = args[0]

@@ -25,12 +25,19 @@ type GitKitConfig struct {
 	Remote string `yaml:"remote"`
 }
 
-func NewGitConfig(rootPath string, replaceConfig bool) GitKitConfig {
+func NewGitConfig(rootPath string, forceCreateConfig bool) GitKitConfig {
 	gitConfig := GitKitConfig{}
-	if replaceConfig {
-		gitConfig.Create(rootPath)
+	err := gitConfig.Load(rootPath, forceCreateConfig)
+	if err != nil && forceCreateConfig {
+		panic(err)
 	}
-	err := gitConfig.Load(rootPath, replaceConfig)
+	return gitConfig
+}
+
+func NewGitConfigForced(rootPath string) GitKitConfig {
+	gitConfig := GitKitConfig{}
+	gitConfig.Create(rootPath)
+	err := gitConfig.Load(rootPath, true)
 	if err != nil {
 		panic(err)
 	}
@@ -45,13 +52,13 @@ func (cfg *GitKitConfig) Exists(rootPath string) bool {
 	return true
 }
 
-func (cfg *GitKitConfig) Load(rootPath string, replaceConfig bool) error {
-	if !cfg.Exists(rootPath) {
+func (cfg *GitKitConfig) Load(rootPath string, forceCreateConfig bool) error {
+	if !cfg.Exists(rootPath) && forceCreateConfig {
 		cfg.Create(rootPath)
 	}
 	configPath := filepath.Join(rootPath, GITKIT_CONFIG_FILE)
 	data, err := os.ReadFile(configPath)
-	if err != nil {
+	if err != nil && forceCreateConfig {
 		err = cfg.Create(rootPath)
 		if err != nil {
 			return err

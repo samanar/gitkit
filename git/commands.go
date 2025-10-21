@@ -25,6 +25,7 @@ func (g *GitCmd) Run(args ...string) (string, error) {
 
 func (g *GitCmd) RunMust(args ...string) string {
 	output, err := g.Run(args...)
+	fmt.Println("running", args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ git %v failed:\n%s\n", args, output)
 		os.Exit(1)
@@ -47,8 +48,9 @@ func (g *GitCmd) Pull() {
 }
 
 func (g *GitCmd) Sync(branch string) {
-	if _, err := g.Run("pull", "--rebase", g.Config.Remote, branch); err != nil {
+	if output, err := g.Run("pull", "--rebase", g.Config.Remote, branch); err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Failed to pull latest '%s': %v\n", branch, err)
+		fmt.Println(output)
 		os.Exit(1)
 	}
 }
