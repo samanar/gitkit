@@ -14,21 +14,10 @@ Traditional Git workflows can be cumbersome and error-prone, especially in enter
 - **Configuration-Driven**: Customize workflows per project with simple YAML configuration
 - **Developer Experience**: Intuitive CLI with helpful prompts and clear error messages
 
-## Key Benefits
-
-- 🚀 **Faster Development Cycles**: Reduce time spent on Git operations by up to 60%
-- 🔒 **Enterprise-Ready**: Built for protected branches and compliance requirements
-- 🤖 **Automation First**: Let GitKit handle the complex Git operations
-- 🌐 **Platform Agnostic**: Works with GitHub, GitLab, and self-hosted solutions
-- ⚙️ **Highly Configurable**: Adapt to your team's specific workflow needs
-- 📚 **Well Documented**: Extensive examples and clear error messages
-
 ## Features
 
 - 🚀 **Git-Flow Workflows**: Feature, bugfix, hotfix, and release branch management
 - ⚙️ **Configuration-Driven**: YAML-based configuration for branch prefixes and remote settings
-- 🔧 **Modern CLI**: Built with Cobra for intuitive command-line interface
-- 📦 **Modular Architecture**: Clean separation of concerns with dependency injection
 - 🎯 **Interactive Setup**: Guided configuration with prompts
 - 🔄 **Sync Operations**: Automated pull/push with remote branch management
 - 🔒 **Protected Branch Support**: Auto-generates merge requests for GitHub/GitLab when branches are protected
@@ -36,22 +25,40 @@ Traditional Git workflows can be cumbersome and error-prone, especially in enter
 
 ## Installation
 
-### From Source
+### Quick Install (Recommended)
 
+**Linux/macOS:**
 ```bash
-git clone https://github.com/samanar/gitkit.git
-cd gitkit
-go build -o gitkit main.go
-# Move to your PATH
-sudo mv gitkit /usr/local/bin/
+curl -sSL https://raw.githubusercontent.com/samanar/gitkit/main/install.sh | bash
 ```
 
-### Download Pre-built Binaries
+**Windows (Git Bash/WSL):**
+```bash
+curl -sSL https://raw.githubusercontent.com/samanar/gitkit/main/install.sh | bash
+```
+
+**Or download and run:**
+```bash
+wget https://raw.githubusercontent.com/samanar/gitkit/main/install.sh
+chmod +x install.sh
+./install.sh
+```
+
+The install script will:
+- ✅ Automatically detect your OS and architecture
+- ✅ Download the appropriate binary
+- ✅ Install to `/usr/local/bin` or `~/.local/bin`
+- ✅ Make `gitkit` command available globally
+
+> **Note for Windows users:** The install script works in Git Bash (comes with Git for Windows) or WSL. For native PowerShell/CMD, download the binary manually from [Releases](https://github.com/samanar/gitkit/releases).
+
+### Manual Installation
+
+#### Download Pre-built Binaries
 
 Download the latest release from [GitHub Releases](https://github.com/samanar/gitkit/releases).
 
 **Installation:**
-
 ```bash
 # Download the binary for your platform
 # Make it executable (Linux/macOS)
@@ -61,10 +68,19 @@ sudo mv gitkit-* /usr/local/bin/gitkit
 ```
 
 **Supported Platforms:**
-
 - Linux (amd64, arm64)
 - macOS (amd64, arm64)
 - Windows (amd64)
+
+#### From Source
+
+```bash
+git clone https://github.com/samanar/gitkit.git
+cd gitkit
+go build -o gitkit main.go
+# Move to your PATH
+sudo mv gitkit /usr/local/bin/
+```
 
 ## Quick Start
 
