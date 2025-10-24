@@ -204,3 +204,12 @@ func (g *GitCmd) StashPop(args ...string) {
 		fmt.Print(output)
 	}
 }
+
+// Clone clones a repository with the given arguments
+func (g *GitCmd) Clone(args ...string) {
+    cloneArgs := append([]string{"clone"}, args...)
+    output := g.RunMust(cloneArgs...)
+    if strings.TrimSpace(output) != "" {
+        fmt.Print(output)
+    }
+}

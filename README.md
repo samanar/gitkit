@@ -1,26 +1,40 @@
 # GitKit
 
-> **Streamline your Git workflow with automated branching strategies and platform integrations**
+> **Streamline your Git workflow with automated branching strategies and
+> platform integrations**
 
-GitKit is a modern, powerful CLI tool that brings git-flow branching strategies to the 21st century. Designed for teams working with protected branches in enterprise environments, GitKit automates complex Git workflows while maintaining clean, predictable branch management.
+GitKit is a modern, powerful CLI tool that brings git-flow branching strategies
+to the 21st century. Designed for teams working with protected branches in
+enterprise environments, GitKit automates complex Git workflows while
+maintaining clean, predictable branch management.
 
 ## Why GitKit?
 
-Traditional Git workflows can be cumbersome and error-prone, especially in enterprise settings with protected branches, code reviews, and multiple environments. GitKit solves these challenges by:
+Traditional Git workflows can be cumbersome and error-prone, especially in
+enterprise settings with protected branches, code reviews, and multiple
+environments. GitKit solves these challenges by:
 
-- **Automating Branch Management**: Never worry about branch naming conventions or merge strategies again
-- **Protected Branch Support**: Seamlessly creates merge requests when direct pushes aren't allowed
-- **Multi-Platform Integration**: Native support for GitHub and GitLab with automatic PR/MR creation
-- **Configuration-Driven**: Customize workflows per project with simple YAML configuration
-- **Developer Experience**: Intuitive CLI with helpful prompts and clear error messages
+- **Automating Branch Management**: Never worry about branch naming conventions
+  or merge strategies again
+- **Protected Branch Support**: Seamlessly creates merge requests when direct
+  pushes aren't allowed
+- **Multi-Platform Integration**: Native support for GitHub and GitLab with
+  automatic PR/MR creation
+- **Configuration-Driven**: Customize workflows per project with simple YAML
+  configuration
+- **Developer Experience**: Intuitive CLI with helpful prompts and clear error
+  messages
 
 ## Features
 
-- 🚀 **Git-Flow Workflows**: Feature, bugfix, hotfix, and release branch management
-- ⚙️ **Configuration-Driven**: YAML-based configuration for branch prefixes and remote settings
+- 🚀 **Git-Flow Workflows**: Feature, bugfix, hotfix, and release branch
+  management
+- ⚙️ **Configuration-Driven**: YAML-based configuration for branch prefixes and
+  remote settings
 - 🎯 **Interactive Setup**: Guided configuration with prompts
 - 🔄 **Sync Operations**: Automated pull/push with remote branch management
-- 🔒 **Protected Branch Support**: Auto-generates merge requests for GitHub/GitLab when branches are protected
+- 🔒 **Protected Branch Support**: Auto-generates merge requests for
+  GitHub/GitLab when branches are protected
 - 🌐 **Multi-Platform**: Native support for GitHub and GitLab integrations
 
 ## Installation
@@ -28,16 +42,19 @@ Traditional Git workflows can be cumbersome and error-prone, especially in enter
 ### Quick Install (Recommended)
 
 **Linux/macOS:**
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/samanar/gitkit/main/install.sh | bash
 ```
 
 **Windows (Git Bash/WSL):**
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/samanar/gitkit/main/install.sh | bash
 ```
 
 **Or download and run:**
+
 ```bash
 wget https://raw.githubusercontent.com/samanar/gitkit/main/install.sh
 chmod +x install.sh
@@ -45,20 +62,25 @@ chmod +x install.sh
 ```
 
 The install script will:
+
 - ✅ Automatically detect your OS and architecture
 - ✅ Download the appropriate binary
 - ✅ Install to `/usr/local/bin` or `~/.local/bin`
 - ✅ Make `gitkit` command available globally
 
-> **Note for Windows users:** The install script works in Git Bash (comes with Git for Windows) or WSL. For native PowerShell/CMD, download the binary manually from [Releases](https://github.com/samanar/gitkit/releases).
+> **Note for Windows users:** The install script works in Git Bash (comes with
+> Git for Windows) or WSL. For native PowerShell/CMD, download the binary
+> manually from [Releases](https://github.com/samanar/gitkit/releases).
 
 ### Manual Installation
 
 #### Download Pre-built Binaries
 
-Download the latest release from [GitHub Releases](https://github.com/samanar/gitkit/releases).
+Download the latest release from
+[GitHub Releases](https://github.com/samanar/gitkit/releases).
 
 **Installation:**
+
 ```bash
 # Download the binary for your platform
 # Make it executable (Linux/macOS)
@@ -68,6 +90,7 @@ sudo mv gitkit-* /usr/local/bin/gitkit
 ```
 
 **Supported Platforms:**
+
 - Linux (amd64, arm64)
 - macOS (amd64, arm64)
 - Windows (amd64)
@@ -107,24 +130,24 @@ gitkit feature finish
 GitKit uses a `.gitkit.yaml` configuration file in your repository root:
 
 ```yaml
-repo: "my-project"
+repo: 'my-project'
 branches:
-  main: "main"
-  develop: "develop"
+  main: 'main'
+  develop: 'develop'
 prefixes:
   feature:
-    name: "feature/"
-    base: "develop"
+    name: 'feature/'
+    base: 'develop'
   bugfix:
-    name: "bugfix/"
-    base: "develop"
+    name: 'bugfix/'
+    base: 'develop'
   hotfix:
-    name: "hotfix/"
-    base: "main"
+    name: 'hotfix/'
+    base: 'main'
   release:
-    name: "release/"
-    base: "develop"
-remote: "origin"
+    name: 'release/'
+    base: 'develop'
+remote: 'origin'
 ```
 
 ## Commands
@@ -191,6 +214,25 @@ gitkit push
 gitkit sync
 ```
 
+### Repository Management
+
+```bash
+# Clone a repository
+gitkit clone https://github.com/user/repo
+
+# Clone with gitkit initialization
+gitkit clone https://github.com/user/repo my-project
+
+# Clone specific branch
+gitkit clone --branch develop https://github.com/user/repo
+
+# Shallow clone (faster for large repos)
+gitkit clone --depth 1 https://github.com/user/repo
+
+# Clone with submodules
+gitkit clone --recurse-submodules https://github.com/user/repo
+```
+
 ### Catch-All Commands
 
 GitKit supports any git command directly:
@@ -203,11 +245,15 @@ gitkit stash list
 
 ## Platform Integration & Merge Requests
 
-GitKit automatically generates merge requests (GitHub) or merge requests (GitLab) when working with protected branches. This is especially useful in enterprise environments where direct pushes to main/develop branches are restricted.
+GitKit automatically generates merge requests (GitHub) or merge requests
+(GitLab) when working with protected branches. This is especially useful in
+enterprise environments where direct pushes to main/develop branches are
+restricted.
 
 ### Setting Up Platform Integration
 
-When you finish a feature, bugfix, hotfix, or release branch, GitKit will automatically create a merge request if:
+When you finish a feature, bugfix, hotfix, or release branch, GitKit will
+automatically create a merge request if:
 
 1. The target branch is protected (cannot be pushed to directly)
 2. Platform integration is configured with valid credentials
@@ -217,7 +263,8 @@ When you finish a feature, bugfix, hotfix, or release branch, GitKit will automa
 
 1. **Generate Personal Access Token:**
 
-   - Go to [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
+   - Go to
+     [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
    - Click "Generate new token (classic)"
    - Select scopes: `repo` (full control of private repositories)
    - Copy the generated token
@@ -231,17 +278,18 @@ When you finish a feature, bugfix, hotfix, or release branch, GitKit will automa
 
 3. **Or manually create `.gitkit_private.yml`:**
    ```yaml
-   username: "your-github-username"
-   accessToken: "ghp_your_token_here"
-   url: "https://api.github.com" # or your GitHub Enterprise URL
-   repositoryName: "your-repo-name"
+   username: 'your-github-username'
+   accessToken: 'ghp_your_token_here'
+   url: 'https://api.github.com' # or your GitHub Enterprise URL
+   repositoryName: 'your-repo-name'
    ```
 
 ### GitLab Setup
 
 1. **Generate Personal Access Token:**
 
-   - Go to [GitLab User Settings > Access Tokens](https://gitlab.com/-/profile/personal_access_tokens)
+   - Go to
+     [GitLab User Settings > Access Tokens](https://gitlab.com/-/profile/personal_access_tokens)
    - Create a new token with `api` scope
    - Copy the generated token
 
@@ -254,17 +302,19 @@ When you finish a feature, bugfix, hotfix, or release branch, GitKit will automa
 
 3. **Or manually create `.gitkit_private.yml`:**
    ```yaml
-   username: "your-gitlab-username"
-   accessToken: "glpat_your_token_here"
-   url: "https://gitlab.com" # or your GitLab instance URL
-   repositoryName: "your-repo-name"
+   username: 'your-gitlab-username'
+   accessToken: 'glpat_your_token_here'
+   url: 'https://gitlab.com' # or your GitLab instance URL
+   repositoryName: 'your-repo-name'
    ```
 
 ### Security Notes
 
 - Access tokens are stored in `.gitkit_private.yml` (add this to `.gitignore`)
-- Tokens require appropriate permissions for repository and merge request creation
-- For GitHub Enterprise or self-hosted GitLab, update the `url` field accordingly
+- Tokens require appropriate permissions for repository and merge request
+  creation
+- For GitHub Enterprise or self-hosted GitLab, update the `url` field
+  accordingly
 
 ## Architecture
 
@@ -342,7 +392,8 @@ GitKit uses automated GitHub Actions for releases:
 
 **Tag Format:** Use semantic versioning (e.g., `v1.2.0`, `v2.0.0-rc.1`)
 
-**Pre-releases:** Tags containing `rc`, `beta`, or `alpha` are marked as pre-releases
+**Pre-releases:** Tags containing `rc`, `beta`, or `alpha` are marked as
+pre-releases
 
 ## Contributing
 
