@@ -25,7 +25,6 @@ func (g *GitCmd) Run(args ...string) (string, error) {
 
 func (g *GitCmd) RunMust(args ...string) string {
 	output, err := g.Run(args...)
-	fmt.Println("running", args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ git %v failed:\n%s\n", args, output)
 		os.Exit(1)
@@ -207,9 +206,9 @@ func (g *GitCmd) StashPop(args ...string) {
 
 // Clone clones a repository with the given arguments
 func (g *GitCmd) Clone(args ...string) {
-    cloneArgs := append([]string{"clone"}, args...)
-    output := g.RunMust(cloneArgs...)
-    if strings.TrimSpace(output) != "" {
-        fmt.Print(output)
-    }
+	cloneArgs := append([]string{"clone"}, args...)
+	output := g.RunMust(cloneArgs...)
+	if strings.TrimSpace(output) != "" {
+		fmt.Print(output)
+	}
 }
